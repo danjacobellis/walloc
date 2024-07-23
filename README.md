@@ -1,2 +1,2 @@
-# walloc
+# WaLLoC
 Wavelet Learned Lossy Compression
