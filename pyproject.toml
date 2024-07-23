@@ -17,5 +17,7 @@ classifiers = [
 ]
 dependencies = [
     "torch",
+    "PyWavelets"
+    "pytorch-wavelets"
 ]
 requires-python = ">=3.6"
