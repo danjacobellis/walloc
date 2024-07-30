@@ -1,2 +1,5 @@
+torch
+einops
 PyWavelets
 pytorch-wavelets
+diffusers
