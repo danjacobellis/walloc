@@ -18,8 +18,8 @@ classifiers = [
 dependencies = [
     "torch",
     "einops",
-    "PyWavelets"
-    "pytorch-wavelets"
-    "diffusers"
+    "PyWavelets",
+    "pytorch-wavelets",
+    "diffusers",
 ]
 requires-python = ">=3.6"
