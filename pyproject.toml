@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "walloc"
-version = "0.2.1"
+version = "0.2.2"
 description = "Wavelet Learned Lossy Compression"
 authors = [
     {name = "Dan Jacobellis", email = "danjacobellis@utexas.edu"}

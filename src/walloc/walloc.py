@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 import einops
 from pytorch_wavelets import DWTForward, DWTInverse
 import diffusers.models.autoencoders as autoencoders 
