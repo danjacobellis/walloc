@@ -4,6 +4,9 @@ datasets:
 ---
 # Wavelet Learned Lossy Compression (WaLLoC)
 
+WaLLoC sandwiches a convolutional autoencoder between time-frequency analysis and synthesis transforms using 
+CDF 9/7 wavelet filters. The time-frequency transform increases the number of signal channels, but reduces the temporal or spatial resolution, resulting in lower GPU memory consumption and higher throughput. WaLLoC's training procedure is highly simplified compared to other $\beta$-VAEs, VQ-VAEs, and neural codecs, but still offers significant dimensionality reduction and compression. This makes it suitable for dataset storage and compressed-domain learning. It currently supports 2D signals (e.g. grayscale, RGB, or hyperspectral images). Support for 1D and 3D signals is in progress.
+
 ## Installation
 
 1. Follow the installation instructions for [torch](https://pytorch.org/get-started/locally/)
@@ -11,9 +14,13 @@ datasets:
 
 ```pip install walloc PyWavelets pytorch-wavelets```
 
-##  Pre-trained checkpoints
+## Pre-trained checkpoints
 
-Pre-trained checkpoints are available on [Hugging Face](https://huggingface.co/danjacobellis/walloc)
+Pre-trained checkpoints are available on [Hugging Face](https://huggingface.co/danjacobellis/walloc).
+
+## Training
+
+Access to training code is provided by request via [email.](mailto:danjacobellis@utexas.edu)
 
 ## Usage example
 
@@ -148,34 +155,77 @@ plt.xticks(range(-15,16,5));
 
 
 ```python
-grid_size = 4
-n_channels, H, W = Y[0].shape
-combined_image = Image.new('L', (W * grid_size, H * grid_size))
-size_bytes = 0
-frames = []
-for i, channel in enumerate(Y[0]):
-    channel = (channel+16).to(torch.uint8)
-    frames.append(Image.fromarray(channel.numpy(), mode='L'))
-    row = i // grid_size
-    col = i % grid_size
-    channel = ToPILImage()(channel)
-    combined_image.paste(channel, (col * W, row * H))
-combined_image
+def concatenate_channels(x):
+    batch_size, N, h, w = x.shape
+    n = int(N**0.5)
+    if n*n != N:
+        raise ValueError("Number of channels must be a perfect square.")
+    
+    x = x.view(batch_size, n, n, h, w)
+    x = x.permute(0, 1, 3, 2, 4).contiguous()
+    x = x.view(batch_size, 1, n*h, n*w)
+    return x
+
+def split_channels(x, N):
+    batch_size, _, H, W = x.shape
+    n = int(N**0.5)
+    h = H // n
+    w = W // n
+    
+    x = x.view(batch_size, n, h, n, w)
+    x = x.permute(0, 1, 3, 2, 4).contiguous()
+    x = x.view(batch_size, N, h, w)
+    return x
+
+def to_bytes(x, n_bits):
+    max_value = 2**(n_bits - 1) - 1
+    min_value = -max_value - 1
+    if x.min() < min_value or x.max() > max_value:
+        raise ValueError(f"Tensor values should be in the range [{min_value}, {max_value}].")
+    return (x + (max_value + 1)).to(torch.uint8)
+
+def from_bytes(x, n_bits):
+    max_value = 2**(n_bits - 1) - 1
+    return (x.to(torch.float32) - (max_value + 1))
+
+def latent_to_pil(latent, n_bits):
+    latent_bytes = to_bytes(latent, n_bits)
+    concatenated_latent = concatenate_channels(latent_bytes)
+    
+    pil_images = []
+    for i in range(concatenated_latent.shape[0]):
+        pil_image = Image.fromarray(concatenated_latent[i][0].numpy(), mode='L')
+        pil_images.append(pil_image)
+    
+    return pil_images
+
+def pil_to_latent(pil_images, N, n_bits):
+    tensor_images = [PILToTensor()(img).unsqueeze(0) for img in pil_images]
+    tensor_images = torch.cat(tensor_images, dim=0)
+    split_latent = split_channels(tensor_images, N)
+    latent = from_bytes(split_latent, n_bits)
+    return latent
+```
+
+
+```python
+Y_pil = latent_to_pil(Y,5)
+Y_pil[0]
 ```
 
 
 
 
     
-![png](README_files/README_14_0.png)
+![png](README_files/README_15_0.png)
     
 
 
 
 
 ```python
-combined_image.save('tmp.png')
-print("compression_ratio: ", x.numel()/os.path.getsize("tmp.png"))
+Y_pil[0].save('latent.png')
+print("compression_ratio: ", x.numel()/os.path.getsize("latent.png"))
 ```
 
     compression_ratio:  20.307596963280485
@@ -183,11 +233,18 @@ print("compression_ratio: ", x.numel()/os.path.getsize("tmp.png"))
 
 
 ```python
-!jupyter nbconvert --to markdown README.ipynb
+Y2 = pil_to_latent(Y_pil, 16, 5)
+(Y == Y2).sum()/Y.numel()
 ```
 
-    [NbConvertApp] Converting notebook README.ipynb to markdown
-    [NbConvertApp] Support files will be in README_files/
-    [NbConvertApp] Making directory README_files
-    [NbConvertApp] Writing 12900 bytes to README.md
 
+
+
+    tensor(1.)
+
+
+
+
+```python
+!jupyter nbconvert --to markdown README.ipynb
+```
