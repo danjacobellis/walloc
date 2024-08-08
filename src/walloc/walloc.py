@@ -2,8 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import einops
+import diffusers.models.autoencoders as autoencoders
 from pytorch_wavelets import DWTForward, DWTInverse
-import diffusers.models.autoencoders as autoencoders 
+from torchvision.transforms import ToPILImage, PILToTensor
+from PIL import Image
 
 class Round(nn.Module):
     def __init__(self):
@@ -87,3 +89,54 @@ class Walloc(nn.Module):
         x_hat = self.wavelet_synthesis(X_hat,J=self.J)
         tf_loss = F.mse_loss( X, X_hat )
         return self.clamp(x_hat), F.mse_loss(x,x_hat), tf_loss
+
+def concatenate_channels(x):
+    batch_size, N, h, w = x.shape
+    n = int(N**0.5)
+    if n*n != N:
+        raise ValueError("Number of channels must be a perfect square.")
+    
+    x = x.view(batch_size, n, n, h, w)
+    x = x.permute(0, 1, 3, 2, 4).contiguous()
+    x = x.view(batch_size, 1, n*h, n*w)
+    return x
+
+def split_channels(x, N):
+    batch_size, _, H, W = x.shape
+    n = int(N**0.5)
+    h = H // n
+    w = W // n
+    
+    x = x.view(batch_size, n, h, n, w)
+    x = x.permute(0, 1, 3, 2, 4).contiguous()
+    x = x.view(batch_size, N, h, w)
+    return x
+
+def to_bytes(x, n_bits):
+    max_value = 2**(n_bits - 1) - 1
+    min_value = -max_value - 1
+    if x.min() < min_value or x.max() > max_value:
+        raise ValueError(f"Tensor values should be in the range [{min_value}, {max_value}].")
+    return (x + (max_value + 1)).to(torch.uint8)
+
+def from_bytes(x, n_bits):
+    max_value = 2**(n_bits - 1) - 1
+    return (x.to(torch.float32) - (max_value + 1))
+
+def latent_to_pil(latent, n_bits):
+    latent_bytes = to_bytes(latent, n_bits)
+    concatenated_latent = concatenate_channels(latent_bytes)
+    
+    pil_images = []
+    for i in range(concatenated_latent.shape[0]):
+        pil_image = Image.fromarray(concatenated_latent[i][0].numpy(), mode='L')
+        pil_images.append(pil_image)
+    
+    return pil_images
+
+def pil_to_latent(pil_images, N, n_bits):
+    tensor_images = [PILToTensor()(img).unsqueeze(0) for img in pil_images]
+    tensor_images = torch.cat(tensor_images, dim=0)
+    split_latent = split_channels(tensor_images, N)
+    latent = from_bytes(split_latent, n_bits)
+    return latent
