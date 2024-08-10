@@ -140,3 +140,33 @@ def pil_to_latent(pil_images, N, n_bits):
     split_latent = split_channels(tensor_images, N)
     latent = from_bytes(split_latent, n_bits)
     return latent
+
+
+
+def compute_padding(in_h: int, in_w: int, *, out_h=None, out_w=None, min_div=1):
+    if out_h is None:
+        out_h = (in_h + min_div - 1) // min_div * min_div
+    if out_w is None:
+        out_w = (in_w + min_div - 1) // min_div * min_div
+    if out_h % min_div != 0 or out_w % min_div != 0:
+        raise ValueError(
+            f"Padded output height and width are not divisible by min_div={min_div}."
+        )
+    left = (out_w - in_w) // 2
+    right = out_w - in_w - left
+    top = (out_h - in_h) // 2
+    bottom = out_h - in_h - top
+    pad = (left, right, top, bottom)
+    unpad = (-left, -right, -top, -bottom)
+    return pad, unpad
+
+def pad(x, p=16, mode='reflect'):
+    h, w = x.size(2), x.size(3)
+    pad, _ = compute_padding(h, w, min_div=p)
+    return F.pad(x, pad, mode=mode)
+
+def crop(x, size):
+    H, W = x.size(2), x.size(3)
+    h, w = size
+    _, unpad = compute_padding(h, w, out_h=H, out_w=W)
+    return F.pad(x, unpad)
