@@ -127,7 +127,7 @@ Y.unique()
 
 
     tensor([-15., -14., -13., -12., -11., -10.,  -9.,  -8.,  -7.,  -6.,  -5.,  -4.,
-             -3.,  -2.,  -1.,  -0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,
+             -3.,  -2.,  -1.,   0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,
               9.,  10.,  11.,  12.,  13.,  14.,  15.])
 
 
@@ -151,7 +151,7 @@ plt.xticks(range(-15,16,5));
     
 
 
-# Lossless compression of latents using PNG
+# Lossless compression of latents using WEBP
 
 
 ```python
@@ -163,23 +163,23 @@ Y_pil[0]
 
 
     
-![png](https://huggingface.co/danjacobellis/walloc/resolve/main/README_files/README_14_0.png)
+![jpeg](README_files/README_14_0.jpg)
     
 
 
 
 
 ```python
-Y_pil[0].save('latent.png')
-print("compression_ratio: ", x.numel()/os.path.getsize("latent.png"))
+Y_pil[0].save('latent.webp',lossless=True)
+print("compression_ratio: ", x.numel()/os.path.getsize("latent.webp"))
 ```
 
-    compression_ratio:  20.307596963280485
+    compression_ratio:  26.13425495148212
 
 
 
 ```python
-Y2 = walloc.pil_to_latent(Y_pil, 16, 5)
+Y2 = pil_to_latent(Y_pil, 16, 5)
 (Y == Y2).sum()/Y.numel()
 ```
 
@@ -194,6 +194,11 @@ Y2 = walloc.pil_to_latent(Y_pil, 16, 5)
 ```python
 !jupyter nbconvert --to markdown README.ipynb
 ```
+
+    [NbConvertApp] Converting notebook README.ipynb to markdown
+    [NbConvertApp] Support files will be in README_files/
+    [NbConvertApp] Writing 5933 bytes to README.md
+
 
 
 ```python

@@ -92,23 +92,23 @@ class Walloc(nn.Module):
 
 def concatenate_channels(x):
     batch_size, N, h, w = x.shape
-    n = int(N**0.5)
-    if n*n != N:
-        raise ValueError("Number of channels must be a perfect square.")
+    if N % 4 != 0 or int((N // 4)**0.5) ** 2 * 4 != N:
+        raise ValueError("Number of channels must satisfy N = 4 * (n^2) for some integer n.")
     
-    x = x.view(batch_size, n, n, h, w)
-    x = x.permute(0, 1, 3, 2, 4).contiguous()
-    x = x.view(batch_size, 1, n*h, n*w)
+    n = int((N // 4)**0.5)
+    x = x.view(batch_size, 4, n, n, h, w)
+    x = x.permute(0, 2, 4, 3, 5, 1).contiguous()
+    x = x.view(batch_size, n*h, n*w, 4)
     return x
 
 def split_channels(x, N):
     batch_size, _, H, W = x.shape
-    n = int(N**0.5)
+    n = int((N // 4)**0.5)
     h = H // n
     w = W // n
     
-    x = x.view(batch_size, n, h, n, w)
-    x = x.permute(0, 1, 3, 2, 4).contiguous()
+    x = x.view(batch_size, 4, n, h, n, w)
+    x = x.permute(0, 1, 2, 4, 3, 5).contiguous()
     x = x.view(batch_size, N, h, w)
     return x
 
@@ -129,7 +129,7 @@ def latent_to_pil(latent, n_bits):
     
     pil_images = []
     for i in range(concatenated_latent.shape[0]):
-        pil_image = Image.fromarray(concatenated_latent[i][0].numpy(), mode='L')
+        pil_image = Image.fromarray(concatenated_latent[i].numpy(), mode='CMYK')
         pil_images.append(pil_image)
     
     return pil_images
@@ -140,8 +140,6 @@ def pil_to_latent(pil_images, N, n_bits):
     split_latent = split_channels(tensor_images, N)
     latent = from_bytes(split_latent, n_bits)
     return latent
-
-
 
 def compute_padding(in_h: int, in_w: int, *, out_h=None, out_w=None, min_div=1):
     if out_h is None:
