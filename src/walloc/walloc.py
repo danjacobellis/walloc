@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import einops
 import diffusers.models.autoencoders as autoencoders
+import einops
+from einops import rearrange
 from pytorch_wavelets import DWTForward, DWTInverse
 from torchvision.transforms import ToPILImage, PILToTensor
 from PIL import Image
@@ -90,28 +91,6 @@ class Walloc(nn.Module):
         tf_loss = F.mse_loss( X, X_hat )
         return self.clamp(x_hat), F.mse_loss(x,x_hat), tf_loss
 
-def concatenate_channels(x):
-    batch_size, N, h, w = x.shape
-    if N % 4 != 0 or int((N // 4)**0.5) ** 2 * 4 != N:
-        raise ValueError("Number of channels must satisfy N = 4 * (n^2) for some integer n.")
-    
-    n = int((N // 4)**0.5)
-    x = x.view(batch_size, 4, n, n, h, w)
-    x = x.permute(0, 2, 4, 3, 5, 1).contiguous()
-    x = x.view(batch_size, n*h, n*w, 4)
-    return x
-
-def split_channels(x, N):
-    batch_size, _, H, W = x.shape
-    n = int((N // 4)**0.5)
-    h = H // n
-    w = W // n
-    
-    x = x.view(batch_size, 4, n, h, n, w)
-    x = x.permute(0, 1, 2, 4, 3, 5).contiguous()
-    x = x.view(batch_size, N, h, w)
-    return x
-
 def to_bytes(x, n_bits):
     max_value = 2**(n_bits - 1) - 1
     min_value = -max_value - 1
@@ -123,21 +102,51 @@ def from_bytes(x, n_bits):
     max_value = 2**(n_bits - 1) - 1
     return (x.to(torch.float32) - (max_value + 1))
 
-def latent_to_pil(latent, n_bits):
+def concatenate_channels(x, C):
+    batch_size, N, h, w = x.shape
+    if N % C != 0 or int((N // C)**0.5) ** 2 * C != N:
+        raise ValueError(f"Number of channels must satisfy N = {C} * (n^2) for some integer n.")
+    
+    n = int((N // C)**0.5)
+    x = rearrange(x, 'b (c nh nw) h w -> b (nh h) (nw w) c', c=C, nh=n, nw=n)
+    return x
+
+def split_channels(x, N, C):
+    batch_size, _, H, W = x.shape
+    n = int((N // C)**0.5)
+    h = H // n
+    w = W // n
+    
+    x = rearrange(x, 'b c (nh h) (nw w) -> b (c nh nw) h w', c=C, nh=n, nw=n)
+    return x
+
+def latent_to_pil(latent, n_bits, C):
     latent_bytes = to_bytes(latent, n_bits)
-    concatenated_latent = concatenate_channels(latent_bytes)
+    concatenated_latent = concatenate_channels(latent_bytes, C)
+    
+    if C == 1:
+        mode = 'L'
+        concatenated_latent = concatenated_latent.squeeze(-1)
+    elif C == 3:
+        mode = 'RGB'
+    elif C == 4:
+        mode = 'CMYK'
+    else:
+        raise ValueError(
+            f"Unsupported number of channels C={C}. Supported values are 1 (L), 3 (RGB), and 4 (CMYK)"
+        )
     
     pil_images = []
     for i in range(concatenated_latent.shape[0]):
-        pil_image = Image.fromarray(concatenated_latent[i].numpy(), mode='CMYK')
+        pil_image = Image.fromarray(concatenated_latent[i].numpy(), mode=mode)
         pil_images.append(pil_image)
     
     return pil_images
 
-def pil_to_latent(pil_images, N, n_bits):
+def pil_to_latent(pil_images, N, n_bits, C):
     tensor_images = [PILToTensor()(img).unsqueeze(0) for img in pil_images]
     tensor_images = torch.cat(tensor_images, dim=0)
-    split_latent = split_channels(tensor_images, N)
+    split_latent = split_channels(tensor_images, N, C)
     latent = from_bytes(split_latent, n_bits)
     return latent
 

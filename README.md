@@ -34,6 +34,7 @@ from PIL import Image
 from IPython.display import display
 from torchvision.transforms import ToPILImage, PILToTensor
 from walloc import walloc
+from walloc.walloc import latent_to_pil, pil_to_latent
 class Args: pass
 ```
 
@@ -127,7 +128,7 @@ Y.unique()
 
 
     tensor([-15., -14., -13., -12., -11., -10.,  -9.,  -8.,  -7.,  -6.,  -5.,  -4.,
-             -3.,  -2.,  -1.,   0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,
+             -3.,  -2.,  -1.,  -0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,
               9.,  10.,  11.,  12.,  13.,  14.,  15.])
 
 
@@ -151,54 +152,78 @@ plt.xticks(range(-15,16,5));
     
 
 
-# Lossless compression of latents using WEBP
+# Lossless compression of latents
+
+### Single channel PNG (L)
 
 
 ```python
-Y_pil = walloc.latent_to_pil(Y,5)
-Y_pil[0]
+Y_pil = latent_to_pil(Y,5,1)
+display(Y_pil[0])
+Y_pil[0].save('latent.png')
+png = [Image.open("latent.png")]
+Y_rec = pil_to_latent(png,16,5,1)
+assert(Y_rec.equal(Y))
+print("compression_ratio: ", x.numel()/os.path.getsize("latent.png"))
 ```
 
 
-
-
     
-![jpeg](README_files/README_14_0.jpg)
+![png](https://huggingface.co/danjacobellis/walloc/resolve/main/README_files/README_14_0.png)
     
 
 
+    compression_ratio:  20.307596963280485
+
+
+### Three channel WebP (RGB)
 
 
 ```python
+Y_pil = latent_to_pil(Y[:,:12],5,3)
+display(Y_pil[0])
 Y_pil[0].save('latent.webp',lossless=True)
-print("compression_ratio: ", x.numel()/os.path.getsize("latent.webp"))
+webp = [Image.open("latent.webp")]
+Y_rec = pil_to_latent(webp,16,5,3)
+assert(Y_rec.equal(Y[:,:12]))
+print("compression_ratio: ", (12/16)*x.numel()/os.path.getsize("latent.webp"))
 ```
 
-    compression_ratio:  26.13425495148212
 
+    
+![png](https://huggingface.co/danjacobellis/walloc/resolve/main/README_files/README_16_0.png)
+    
+
+
+    compression_ratio:  21.436712541190154
+
+
+### Four channel TIF (CMYK)
 
 
 ```python
-Y2 = pil_to_latent(Y_pil, 16, 5)
-(Y == Y2).sum()/Y.numel()
+Y_pil = latent_to_pil(Y,5,4)
+display(Y_pil[0])
+Y_pil[0].save('latent.tif',compression="tiff_adobe_deflate")
+tif = [Image.open("latent.tif")]
+Y_rec = pil_to_latent(tif,16,5,4)
+assert(Y_rec.equal(Y))
+print("compression_ratio: ", x.numel()/os.path.getsize("latent.png"))
 ```
 
 
+    
+![jpeg](README_files/README_18_0.jpg)
+    
 
 
-    tensor(1.)
-
+    compression_ratio:  20.307596963280485
 
 
 
 ```python
 !jupyter nbconvert --to markdown README.ipynb
 ```
-
-    [NbConvertApp] Converting notebook README.ipynb to markdown
-    [NbConvertApp] Support files will be in README_files/
-    [NbConvertApp] Writing 5933 bytes to README.md
-
 
 
 ```python
