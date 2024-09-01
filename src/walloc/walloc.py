@@ -19,7 +19,7 @@ class Round(nn.Module):
             return torch.round(x)
         
 class Walloc(nn.Module):
-    def __init__(self, channels, J, Ne, Nd, latent_dim, n_bits):
+    def __init__(self, channels, J, Ne, Nd, latent_dim, latent_bits):
         super().__init__()
         self.channels = channels
         self.J = J
@@ -27,8 +27,8 @@ class Walloc(nn.Module):
         self.Ne = Ne
         self.Nd = Nd
         self.latent_dim = latent_dim
-        self.n_bits = n_bits
-        self.latent_max = 2**(n_bits-1)-1+0.5-1e-3
+        self.latent_bits = latent_bits
+        self.latent_max = 2**(latent_bits-1)-1+0.5-1e-3
         self.wt  = DWTForward(J=1, mode='periodization', wave='bior4.4')
         self.iwt = DWTInverse(mode='periodization', wave='bior4.4')
         self.clamp = torch.nn.Hardtanh(min_val=-0.5, max_val=0.5)
@@ -53,7 +53,7 @@ class Walloc(nn.Module):
                     out_channels = self.channels*self.freq_bands,
                     up_block_types = ('UpDecoderBlock2D',),
                     block_out_channels = (Nd,),
-                    layers_per_block = 6,
+                    layers_per_block = 2,
                     norm_num_groups = 32,
                     act_fn = 'silu',
                     mid_block_add_attention=True,
