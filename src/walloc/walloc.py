@@ -19,7 +19,7 @@ class Round(nn.Module):
             return torch.round(x)
         
 class Walloc(nn.Module):
-    def __init__(self, channels, J, Ne, Nd, latent_dim, latent_bits):
+    def __init__(self, channels, J, Ne, Nd, latent_dim, latent_bits, lightweight_encode):
         super().__init__()
         self.channels = channels
         self.J = J
@@ -32,21 +32,39 @@ class Walloc(nn.Module):
         self.wt  = DWTForward(J=1, mode='periodization', wave='bior4.4')
         self.iwt = DWTInverse(mode='periodization', wave='bior4.4')
         self.clamp = torch.nn.Hardtanh(min_val=-0.5, max_val=0.5)
-        self.encoder = nn.Sequential(
-            autoencoders.autoencoder_kl.Encoder(
-                in_channels = self.channels*self.freq_bands,
-                out_channels = self.latent_dim,
-                down_block_types = ('DownEncoderBlock2D',),
-                block_out_channels = (Ne,),
-                layers_per_block = 2,
-                norm_num_groups = 32,
-                act_fn = 'silu',
-                double_z = False,
-                mid_block_add_attention=True,
-            ),
+
+        entropy_bottleneck = [
             torch.nn.Hardtanh(min_val=-self.latent_max, max_val=self.latent_max),
             Round()
-        )
+        ]
+
+        if lightweight_encode:
+            self.encoder = nn.Sequential(
+                nn.Conv2d(
+                    in_channels=self.channels * self.freq_bands,
+                    out_channels=self.latent_dim,
+                    kernel_size=(1, 1),
+                    stride=(1, 1),
+                    padding=(0, 0),
+                ),
+                *entropy_bottleneck
+            )
+        else:
+            self.encoder = nn.Sequential(
+                autoencoders.autoencoder_kl.Encoder(
+                    in_channels=self.channels * self.freq_bands,
+                    out_channels=self.latent_dim,
+                    down_block_types=('DownEncoderBlock2D',),
+                    block_out_channels=(Ne,),
+                    layers_per_block=2,
+                    norm_num_groups=32,
+                    act_fn='silu',
+                    double_z=False,
+                    mid_block_add_attention=True,
+                ),
+                *entropy_bottleneck
+            )
+        
         self.decoder = nn.Sequential(
                 autoencoders.autoencoder_kl.Decoder(
                     in_channels = self.latent_dim,
