@@ -5,7 +5,7 @@ datasets:
 # Wavelet Learned Lossy Compression (WaLLoC)
 
 WaLLoC sandwiches a convolutional autoencoder between time-frequency analysis and synthesis transforms using 
-CDF 9/7 wavelet filters. The time-frequency transform increases the number of signal channels, but reduces the temporal or spatial resolution, resulting in lower GPU memory consumption and higher throughput. WaLLoC's training procedure is highly simplified compared to other $\beta$-VAEs, VQ-VAEs, and neural codecs, but still offers significant dimensionality reduction and compression. This makes it suitable for dataset storage and compressed-domain learning. It currently supports 2D signals (e.g. grayscale, RGB, or hyperspectral images). Support for 1D and 3D signals is in progress.
+CDF 9/7 wavelet filters. The time-frequency transform increases the number of signal channels, but reduces the temporal or spatial resolution, resulting in lower GPU memory consumption and higher throughput. WaLLoC's training procedure is highly simplified compared to other $\beta$-VAEs, VQ-VAEs, and neural codecs, but still offers significant dimensionality reduction and compression. This makes it suitable for dataset storage and compressed-domain learning. It currently supports 1D and 2D signals (e.g. mono, stereo, or multi-channel audio, grayscale, RGB, or hyperspectral images).
 
 ## Installation
 
@@ -30,32 +30,35 @@ import os
 import torch
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageEnhance
 from IPython.display import display
 from torchvision.transforms import ToPILImage, PILToTensor
 from walloc import walloc
 from walloc.walloc import latent_to_pil, pil_to_latent
-class Args: pass
+class Config: pass
 ```
 
 ### Load the model from a pre-trained checkpoint
 
-```wget https://hf.co/danjacobellis/walloc/resolve/main/v0.6.3_ext.pth```
+```wget https://hf.co/danjacobellis/walloc/resolve/main/RGB_Li_27c_J3_nf4_v1.0.2.pth```
 
 
 ```python
 device = "cpu"
-checkpoint = torch.load("v0.6.3_ext.pth",map_location="cpu")
-args = checkpoint['args']
-codec = walloc.Walloc(
-    channels = args.channels,
-    J = args.J,
-    N = args.N,
-    latent_dim = args.latent_dim,
-    latent_bits = 5
+checkpoint = torch.load("RGB_Li_27c_J3_nf4_v1.0.2.pth",map_location="cpu",weights_only=False)
+codec_config = checkpoint['config']
+codec = walloc.Codec2D(
+    channels = codec_config.channels,
+    J = codec_config.J,
+    Ne = codec_config.Ne,
+    Nd = codec_config.Nd,
+    latent_dim = codec_config.latent_dim,
+    latent_bits = codec_config.latent_bits,
+    lightweight_encode = codec_config.lightweight_encode
 )
 codec.load_state_dict(checkpoint['model_state_dict'])
 codec = codec.to(device)
+codec.eval();
 ```
 
 ### Load an example image
@@ -72,7 +75,7 @@ img
 
 
     
-![png](https://huggingface.co/danjacobellis/walloc/resolve/main/README_files/README_6_0.png)
+![png](README_files/README_6_0.png)
     
 
 
@@ -97,7 +100,7 @@ ToPILImage()(x_hat[0]+0.5)
 
 
     
-![png](https://huggingface.co/danjacobellis/walloc/resolve/main/README_files/README_8_0.png)
+![png](README_files/README_8_0.png)
     
 
 
@@ -116,7 +119,7 @@ with torch.no_grad():
 print(f"dimensionality reduction: {x.numel()/Y.numel()}×")
 ```
 
-    dimensionality reduction: 12.0×
+    dimensionality reduction: 7.111111111111111×
 
 
 
@@ -127,9 +130,8 @@ Y.unique()
 
 
 
-    tensor([-15., -14., -13., -12., -11., -10.,  -9.,  -8.,  -7.,  -6.,  -5.,  -4.,
-             -3.,  -2.,  -1.,  -0.,   1.,   2.,   3.,   4.,   5.,   6.,   7.,   8.,
-              9.,  10.,  11.,  12.,  13.,  14.,  15.])
+    tensor([-7., -6., -5., -4., -3., -2., -1., -0.,  1.,  2.,  3.,  4.,  5.,  6.,
+             7.])
 
 
 
@@ -138,92 +140,118 @@ Y.unique()
 plt.figure(figsize=(5,3),dpi=150)
 plt.hist(
     Y.flatten().numpy(),
-    range=(-17.5,17.5),
-    bins=35,
+    range=(-7.5,7.5),
+    bins=15,
     density=True,
-    width=0.8);
+    width=0.9);
 plt.title("Histogram of latents")
-plt.xticks(range(-15,16,5));
+plt.xticks(range(-7,8,1));
+plt.xlim([-7.5,7.5])
 ```
 
 
+
+
+    (-7.5, 7.5)
+
+
+
+
     
-![png](https://huggingface.co/danjacobellis/walloc/resolve/main/README_files/README_12_0.png)
+![png](README_files/README_12_1.png)
     
 
 
 # Lossless compression of latents
 
+
+```python
+def scale_for_display(img, n_bits):
+    scale_factor = (2**8 - 1) / (2**n_bits - 1)
+    lut = [int(i * scale_factor) for i in range(2**n_bits)]
+    channels = img.split()
+    scaled_channels = [ch.point(lut * 2**(8-n_bits)) for ch in channels]
+    return Image.merge(img.mode, scaled_channels)
+```
+
 ### Single channel PNG (L)
 
 
 ```python
-Y_pil = latent_to_pil(Y,5,1)
-display(Y_pil[0])
+Y_padded = torch.nn.functional.pad(Y, (0, 0, 0, 0, 0, 9))
+Y_pil = latent_to_pil(Y_padded,codec.latent_bits,1)
+display(scale_for_display(Y_pil[0], codec.latent_bits))
 Y_pil[0].save('latent.png')
 png = [Image.open("latent.png")]
-Y_rec = pil_to_latent(png,16,5,1)
-assert(Y_rec.equal(Y))
+Y_rec = pil_to_latent(png,36,codec.latent_bits,1)
+assert(Y_rec.equal(Y_padded))
 print("compression_ratio: ", x.numel()/os.path.getsize("latent.png"))
 ```
 
 
     
-![png](https://huggingface.co/danjacobellis/walloc/resolve/main/README_files/README_14_0.png)
+![png](README_files/README_16_0.png)
     
 
 
-    compression_ratio:  20.307596963280485
+    compression_ratio:  15.171345894154717
 
 
 ### Three channel WebP (RGB)
 
 
 ```python
-Y_pil = latent_to_pil(Y[:,:12],5,3)
-display(Y_pil[0])
+Y_pil = latent_to_pil(Y,codec.latent_bits,3)
+display(scale_for_display(Y_pil[0], codec.latent_bits))
 Y_pil[0].save('latent.webp',lossless=True)
 webp = [Image.open("latent.webp")]
-Y_rec = pil_to_latent(webp,16,5,3)
-assert(Y_rec.equal(Y[:,:12]))
-print("compression_ratio: ", (12/16)*x.numel()/os.path.getsize("latent.webp"))
+Y_rec = pil_to_latent(webp,27,codec.latent_bits,3)
+assert(Y_rec.equal(Y))
+print("compression_ratio: ", x.numel()/os.path.getsize("latent.webp"))
 ```
 
 
     
-![png](https://huggingface.co/danjacobellis/walloc/resolve/main/README_files/README_16_0.png)
+![png](README_files/README_18_0.png)
     
 
 
-    compression_ratio:  21.436712541190154
+    compression_ratio:  16.451175633838172
 
 
 ### Four channel TIF (CMYK)
 
 
 ```python
-Y_pil = latent_to_pil(Y,5,4)
-display(Y_pil[0])
+Y_padded = torch.nn.functional.pad(Y, (0, 0, 0, 0, 0, 9))
+Y_pil = latent_to_pil(Y_padded,codec.latent_bits,4)
+display(scale_for_display(Y_pil[0], codec.latent_bits))
 Y_pil[0].save('latent.tif',compression="tiff_adobe_deflate")
 tif = [Image.open("latent.tif")]
-Y_rec = pil_to_latent(tif,16,5,4)
-assert(Y_rec.equal(Y))
-print("compression_ratio: ", x.numel()/os.path.getsize("latent.png"))
+Y_rec = pil_to_latent(tif,36,codec.latent_bits,4)
+assert(Y_rec.equal(Y_padded))
+print("compression_ratio: ", x.numel()/os.path.getsize("latent.tif"))
 ```
 
 
     
-![jpeg](README_files/README_18_0.jpg)
+![jpeg](README_files/README_20_0.jpg)
     
 
 
-    compression_ratio:  20.307596963280485
+    compression_ratio:  12.40611656815935
 
 
 
 ```python
 !jupyter nbconvert --to markdown README.ipynb
 ```
+
+    [NbConvertApp] Converting notebook README.ipynb to markdown
+    [NbConvertApp] Support files will be in README_files/
+    [NbConvertApp] Making directory README_files
+    [NbConvertApp] Writing 5002 bytes to README.md
+
 
 
 ```python
