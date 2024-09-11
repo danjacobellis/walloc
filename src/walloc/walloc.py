@@ -4,9 +4,31 @@ import torch.nn.functional as F
 import diffusers.models.autoencoders as autoencoders
 import einops
 from einops import rearrange
-from pytorch_wavelets import DWTForward, DWTInverse
+from pytorch_wavelets import DWTForward, DWT1DForward, DWTInverse, DWT1DInverse
+from torch.distributions import Normal
 from torchvision.transforms import ToPILImage, PILToTensor
 from PIL import Image
+
+import torch
+import torch.nn as nn
+import numpy as np
+import einops
+from pytorch_wavelets import DWTForward, DWTInverse
+from torch.distributions import Normal
+import diffusers.models.autoencoders as autoencoders 
+
+class ToUniform(nn.Module):
+    def __init__(self,scale,latent_max):
+        super(ToUniform, self).__init__()
+        self.scale = scale
+        self.latent_max = latent_max
+        self.normal = Normal(loc=0,scale=1)
+    def forward(self, x):
+        x = x/self.scale
+        x = self.normal.cdf(x)
+        x = x - 0.5
+        x = 2*self.latent_max*x
+        return x
 
 class Round(nn.Module):
     def __init__(self):
@@ -17,8 +39,22 @@ class Round(nn.Module):
             return x + noise
         else:
             return torch.round(x)
+
+class ToNormal(nn.Module):
+    def __init__(self,scale,latent_max):
+        super(ToNormal, self).__init__()
+        self.scale = scale
+        self.latent_max = latent_max
+        self.normal = Normal(loc=0,scale=1)
+    def forward(self, x):
+        x = x/(2*self.latent_max)
+        x = x + 0.5
+        x = nn.Hardtanh(min_val=0.0001, max_val=0.9999)(x)
+        x = self.normal.icdf(x)
+        x = self.scale*x
+        return x
         
-class Walloc(nn.Module):
+class Codec2D(nn.Module):
     def __init__(self, channels, J, Ne, Nd, latent_dim, latent_bits, lightweight_encode):
         super().__init__()
         self.channels = channels
@@ -34,8 +70,11 @@ class Walloc(nn.Module):
         self.clamp = torch.nn.Hardtanh(min_val=-0.5, max_val=0.5)
 
         entropy_bottleneck = [
-            torch.nn.Hardtanh(min_val=-self.latent_max, max_val=self.latent_max),
-            Round()
+            ToUniform(
+                scale = (2**(latent_bits-1)-1)/1.85,
+                latent_max = self.latent_max
+            ),
+            Round(), 
         ]
 
         if lightweight_encode:
@@ -64,19 +103,23 @@ class Walloc(nn.Module):
                 ),
                 *entropy_bottleneck
             )
-        
+            
         self.decoder = nn.Sequential(
-                autoencoders.autoencoder_kl.Decoder(
-                    in_channels = self.latent_dim,
-                    out_channels = self.channels*self.freq_bands,
-                    up_block_types = ('UpDecoderBlock2D',),
-                    block_out_channels = (Nd,),
-                    layers_per_block = 2,
-                    norm_num_groups = 32,
-                    act_fn = 'silu',
-                    mid_block_add_attention=True,
-                ),
-            )
+            ToNormal(
+                scale = (2**(latent_bits-1)-1)/1.85,
+                latent_max = self.latent_max
+            ),
+            autoencoders.autoencoder_kl.Decoder(
+                in_channels = self.latent_dim,
+                out_channels = self.channels*self.freq_bands,
+                up_block_types = ('UpDecoderBlock2D',),
+                block_out_channels = (Nd,),
+                layers_per_block = 2,
+                norm_num_groups = 32,
+                act_fn = 'silu',
+                mid_block_add_attention=True,
+            ),
+        )
         
     def analysis_one_level(self,x):
         L, H = self.wt(x)
@@ -107,6 +150,110 @@ class Walloc(nn.Module):
         Y = self.encoder(X)
         X_hat = self.decoder(Y)
         x_hat = self.wavelet_synthesis(X_hat,J=self.J)
+        tf_loss = F.mse_loss(X, X_hat)
+        return self.clamp(x_hat), F.mse_loss(x,x_hat), tf_loss
+
+class Codec1D(nn.Module):
+    def __init__(self, channels, J, Ne, Nd, latent_dim, latent_bits, lightweight_encode, post_filter):
+        super().__init__()
+        self.channels = channels
+        self.J = J
+        self.freq_bands = 2**J
+        self.Ne = Ne
+        self.Nd = Nd
+        self.lightweight_encode = lightweight_encode
+        self.post_filter = post_filter
+        self.latent_dim = latent_dim
+        self.latent_bits = latent_bits
+        self.latent_max = 2**(latent_bits-1)-1+0.5-1e-3
+        self.wt  = DWT1DForward(J=1, mode='periodization', wave='bior4.4')
+        self.iwt = DWT1DInverse(mode='periodization', wave='bior4.4')
+        self.clamp = torch.nn.Hardtanh(min_val=-0.5, max_val=0.5)
+
+        entropy_bottleneck = [
+            ToUniform(
+                scale = (2**(latent_bits-1)-1)/1.85,
+                latent_max = self.latent_max
+            ),
+            Round(),
+        ]
+
+        if lightweight_encode:
+            self.encoder = nn.Sequential(
+                nn.Conv1d(
+                    in_channels=self.channels * self.freq_bands,
+                    out_channels=self.latent_dim,
+                    kernel_size=1,
+                    stride=1,
+                    padding=1,
+                ),
+                *entropy_bottleneck
+            )
+        else:
+            self.encoder = nn.Sequential(
+                autoencoders.autoencoder_oobleck.OobleckEncoder(
+                    encoder_hidden_size=self.latent_dim,
+                    audio_channels=self.channels*self.freq_bands,
+                    downsampling_ratios=2*[1],
+                    channel_multiples=2*[self.Ne//self.latent_dim],
+                ),
+                *entropy_bottleneck
+            )
+            
+        self.decoder = nn.Sequential(
+            ToNormal(
+                scale = (2**(latent_bits-1)-1)/1.85,
+                latent_max = self.latent_max
+            ),
+            autoencoders.autoencoder_oobleck.OobleckDecoder(
+                channels=self.latent_dim,
+                input_channels=self.latent_dim,
+                audio_channels=self.channels*self.freq_bands,
+                upsampling_ratios=2*[1],
+                channel_multiples=2*[self.Nd//self.latent_dim],
+            )
+        )
+
+        if post_filter:
+            self.post = nn.Conv1d(
+                    in_channels=self.channels,
+                    out_channels=self.channels,
+                    kernel_size=129,
+                    stride=1,
+                    padding=64,
+                )
+    
+    def analysis_one_level(self,x):
+        L, H = self.wt(x)
+        X = torch.cat([L.unsqueeze(2),H[0].unsqueeze(2)],dim=2)
+        X = einops.rearrange(X, 'b c f ℓ -> b (c f) ℓ')
+        return X
+    
+    def wavelet_analysis(self,x,J=3):
+        for _ in range(J):
+            x = self.analysis_one_level(x)
+        return x
+    
+    def synthesis_one_level(self,X):
+        X = einops.rearrange(X, 'b (c f) ℓ -> b c f ℓ', f=2)
+        L, H = torch.split(X, [1, 1], dim=2)
+        L = L.squeeze(2)
+        H = [H.squeeze(2)]
+        y = self.iwt((L, H))
+        return y
+    
+    def wavelet_synthesis(self,x,J=3):
+        for _ in range(J):
+            x = self.synthesis_one_level(x)
+        return x
+            
+    def forward(self, x):
+        X = self.wavelet_analysis(x,J=self.J)
+        Y = self.encoder(X)
+        X_hat = self.decoder(Y)
+        x_hat = self.wavelet_synthesis(X_hat,J=self.J)
+        if self.post_filter:
+            x_hat = self.post(x_hat)
         tf_loss = F.mse_loss( X, X_hat )
         return self.clamp(x_hat), F.mse_loss(x,x_hat), tf_loss
 
