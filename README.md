@@ -1,7 +1,13 @@
 ---
 datasets:
 - danjacobellis/LSDIR_540
+- danjacobellis/musdb_segments
 ---
+
+- [Paper: "Learned Compression for Compressed Learning"](https://danjacobellis.net/_static/walloc.pdf)
+- [Additional code accompanying the paper](https://github.com/danjacobellis/lccl)
+- [Download pre-trained codecs on Hugging Face](https://huggingface.co/danjacobellis/walloc)
+
 # Wavelet Learned Lossy Compression (WaLLoC)
 
 WaLLoC sandwiches a convolutional autoencoder between time-frequency analysis and synthesis transforms using 
