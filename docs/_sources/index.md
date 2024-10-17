@@ -6,7 +6,7 @@
 - [Pre-trained codecs available on Hugging Face](https://huggingface.co/danjacobellis/walloc)
 
 
-```{figure} ../images/img/radar.svg
+```{figure} img/radar.svg
 ---
 name: radar
 ---
@@ -14,7 +14,7 @@ Comparison of WaLLoC with other autoencoder designs for RGB Images and stereo au
 
 ```
 
-```{figure} ../images/img/wpt.svg
+```{figure} img/wpt.svg
 ---
 name: walloc
 ---
@@ -23,7 +23,7 @@ and $\text{H}_{\text{S}}$, then summing the two channels. The full WPT $\tilde{\
 
 ```
 
-```{figure} ../images/img/walloc.svg
+```{figure} img/walloc.svg
 ---
 name: walloc
 ---
