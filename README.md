@@ -1,7 +1,6 @@
-# [WaLLoC Documentation](https://walloc.github.io)
+# [Wavelet Learned Lossy Compression]
 
-- [Documentation](https://walloc.github.io)
-- [WaLLoC repository](https://github.com/danjacobellis/walloc/)
+- [Documentation (WIP)](https://danjacobellis.net/walloc)
 - [Paper: "Learned Compression for Compressed Learning"](https://danjacobellis.net/_static/walloc.pdf)
 - [Additional code accompanying the paper](https://github.com/danjacobellis/lccl)
 - [Pre-trained codecs available on Hugging Face](https://huggingface.co/danjacobellis/walloc)
