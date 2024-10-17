@@ -14,5 +14,5 @@ parts:
     
   - caption: Training
     chapters:
-    - file: train_1d
-    - file: train_2d
+    - file: train_stereo
+    - file: train_rgb
