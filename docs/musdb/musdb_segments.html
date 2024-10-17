@@ -1,0 +1,749 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>&lt;no title&gt; &#8212; Wavelet Learned Lossy Compression</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+    <script src="../_static/documentation_options.js?v=9eb32ce0"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'musdb/musdb_segments';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search this book..."
+         aria-label="Search this book..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">Wavelet Learned Lossy Compression</p>
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        
+        <ul class="nav bd-sidenav bd-sidenav__home-link">
+            <li class="toctree-l1">
+                <a class="reference internal" href="../index.html">
+                    Wavelet Learned Lossy Compression
+                </a>
+            </li>
+        </ul>
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">Introduction</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../image_compression.html">Wavelet Learned Lossy Compression (WaLLoC)</a></li>
+
+<li class="toctree-l1"><a class="reference internal" href="../audio_compression.html">Audio Compression</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Training</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="../train_1d.html">Training (1D signals)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../train_2d.html">Training (2D signals)</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-source-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Source repositories">
+    <i class="fab fa-github"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="https://github.com/danjacobellis/walloc.github.io" target="_blank"
+   class="btn btn-sm btn-source-repository-button dropdown-item"
+   title="Source repository"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+<span class="btn__text-container">Repository</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li><a href="https://github.com/danjacobellis/walloc.github.io/issues/new?title=Issue%20on%20page%20%2Fmusdb/musdb_segments.html&body=Your%20issue%20content%20here." target="_blank"
+   class="btn btn-sm btn-source-issues-button dropdown-item"
+   title="Open an issue"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-lightbulb"></i>
+  </span>
+<span class="btn__text-container">Open issue</span>
+</a>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Download this page">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/musdb/musdb_segments.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="Download source file"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="Print to PDF"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="Fullscreen mode"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
+
+
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+  </button>
+`);
+</script>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1><no title></h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="simple visible nav section-nav flex-column">
+</ul>
+
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>wget<span class="w"> </span>-c<span class="w"> </span>https://zenodo.org/records/3338373/files/musdb18hq.zip
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">!</span>unzip<span class="w"> </span>musdb18hq.zip<span class="w"> </span>-d<span class="w"> </span>musdb18hq
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torchaudio</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Features</span><span class="p">,</span> <span class="n">Audio</span><span class="p">,</span> <span class="n">Value</span>
+<span class="kn">from</span> <span class="nn">einops</span> <span class="kn">import</span> <span class="n">rearrange</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">21</span>
+<span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]:</span>
+    <span class="n">tracks</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;musdb18hq/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/*/*.wav&quot;</span><span class="p">)][::</span><span class="mi">5</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">i_track</span><span class="p">,</span> <span class="n">track</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tracks</span><span class="p">):</span>
+            <span class="n">mix_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb18hq/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/mixture.wav&quot;</span>
+            <span class="n">vocal_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb18hq/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/vocals.wav&quot;</span>
+            <span class="n">bass_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb18hq/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/bass.wav&quot;</span>
+            <span class="n">drums_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb18hq/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/drums.wav&quot;</span>
+            <span class="n">other_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb18hq/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/other.wav&quot;</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">mix_path</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">v</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">vocal_path</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">b</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bass_path</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">d</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">drums_path</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">o</span><span class="p">,</span> <span class="n">fs</span> <span class="o">=</span> <span class="n">torchaudio</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">other_path</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">C</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">v</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">d</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">o</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">fs</span><span class="o">==</span><span class="mi">44100</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">C</span><span class="o">==</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">v</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">b</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">d</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">o</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">int16</span><span class="p">)</span>
+        
+            <span class="k">if</span> <span class="n">L</span><span class="o">&lt;=</span><span class="n">N</span><span class="o">//</span><span class="mi">2</span><span class="p">:</span>
+                <span class="k">continue</span>
+        
+            <span class="k">if</span> <span class="p">(</span><span class="n">L</span><span class="o">%</span><span class="k">N</span>)/N &gt; 0.5:
+                <span class="c1"># pad</span>
+                <span class="n">B</span> <span class="o">=</span> <span class="n">L</span><span class="o">//</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">pad_length</span> <span class="o">=</span> <span class="n">B</span> <span class="o">*</span> <span class="n">N</span> <span class="o">-</span> <span class="n">L</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pad_length</span><span class="p">))</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pad_length</span><span class="p">))</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pad_length</span><span class="p">))</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pad_length</span><span class="p">))</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">functional</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">pad_length</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># drop last segment</span>
+                <span class="n">B</span> <span class="o">=</span> <span class="n">L</span><span class="o">//</span><span class="n">N</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:(</span><span class="n">B</span> <span class="o">*</span> <span class="n">N</span><span class="p">)]</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[:,</span> <span class="p">:(</span><span class="n">B</span> <span class="o">*</span> <span class="n">N</span><span class="p">)]</span>
+                <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">[:,</span> <span class="p">:(</span><span class="n">B</span> <span class="o">*</span> <span class="n">N</span><span class="p">)]</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="p">[:,</span> <span class="p">:(</span><span class="n">B</span> <span class="o">*</span> <span class="n">N</span><span class="p">)]</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="p">[:,</span> <span class="p">:(</span><span class="n">B</span> <span class="o">*</span> <span class="n">N</span><span class="p">)]</span>
+                
+            <span class="c1"># Split the file into non-overlapping 48-second chunks</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s1">&#39;C (B N) -&gt; B C N&#39;</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;C (B N) -&gt; B C N&#39;</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s1">&#39;C (B N) -&gt; B C N&#39;</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s1">&#39;C (B N) -&gt; B C N&#39;</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s1">&#39;C (B N) -&gt; B C N&#39;</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="n">B</span><span class="p">,</span> <span class="n">N</span><span class="o">=</span><span class="n">N</span><span class="p">)</span>
+            
+            <span class="c1"># remove segments that don&#39;t have enough vocals</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">float</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">]</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">]</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">]</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">]</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="n">o</span><span class="p">[</span><span class="n">p</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">]</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            
+            <span class="c1"># TODO: save each of the</span>
+            <span class="k">for</span> <span class="n">i_seg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="p">):</span>
+                <span class="n">mix_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/mixture/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+                <span class="n">vocal_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/vocals/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+                <span class="n">bass_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/bass/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+                <span class="n">drums_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/drums/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+                <span class="n">other_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/other/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+                <span class="n">mix_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">mix_file</span><span class="p">)</span>
+                <span class="n">vocal_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">vocal_file</span><span class="p">)</span>
+                <span class="n">bass_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">bass_file</span><span class="p">)</span>
+                <span class="n">drums_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">drums_file</span><span class="p">)</span>
+                <span class="n">other_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">other_file</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">mix_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">vocal_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">bass_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">drums_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">other_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                    <span class="n">uri</span><span class="o">=</span><span class="n">mix_file</span><span class="p">,</span>
+                    <span class="n">src</span><span class="o">=</span><span class="n">x</span><span class="p">[</span><span class="n">i_seg</span><span class="p">],</span>
+                    <span class="n">sample_rate</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                    <span class="n">uri</span><span class="o">=</span><span class="n">vocal_file</span><span class="p">,</span>
+                    <span class="n">src</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="n">i_seg</span><span class="p">],</span>
+                    <span class="n">sample_rate</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                    <span class="n">uri</span><span class="o">=</span><span class="n">bass_file</span><span class="p">,</span>
+                    <span class="n">src</span><span class="o">=</span><span class="n">b</span><span class="p">[</span><span class="n">i_seg</span><span class="p">],</span>
+                    <span class="n">sample_rate</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                    <span class="n">uri</span><span class="o">=</span><span class="n">drums_file</span><span class="p">,</span>
+                    <span class="n">src</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="n">i_seg</span><span class="p">],</span>
+                    <span class="n">sample_rate</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">torchaudio</span><span class="o">.</span><span class="n">save</span><span class="p">(</span>
+                    <span class="n">uri</span><span class="o">=</span><span class="n">other_file</span><span class="p">,</span>
+                    <span class="n">src</span><span class="o">=</span><span class="n">o</span><span class="p">[</span><span class="n">i_seg</span><span class="p">],</span>
+                    <span class="n">sample_rate</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span>
+                <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ds</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">]:</span>
+    <span class="n">tracks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">p</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/*/*/*.wav&quot;</span><span class="p">)]))</span>
+    <span class="n">path_mix</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_vocal</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_bass</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_drums</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">path_other</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">audio_mix</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">audio_vocal</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">audio_bass</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">audio_drums</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">audio_other</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">track</span> <span class="ow">in</span> <span class="n">tracks</span><span class="p">:</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/mixture/*.wav&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i_seg</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">)):</span>
+            <span class="n">mix_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/mixture/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+            <span class="n">vocal_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/vocals/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+            <span class="n">bass_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/bass/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+            <span class="n">drums_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/drums/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+            <span class="n">other_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;musdb_segments/</span><span class="si">{</span><span class="n">split</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">track</span><span class="si">}</span><span class="s2">/other/</span><span class="si">{</span><span class="n">i_seg</span><span class="si">}</span><span class="s2">.wav&quot;</span>
+            <span class="n">path_mix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mix_file</span><span class="p">)</span>
+            <span class="n">path_vocal</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vocal_file</span><span class="p">)</span>
+            <span class="n">path_bass</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bass_file</span><span class="p">)</span>
+            <span class="n">path_drums</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">drums_file</span><span class="p">)</span>
+            <span class="n">path_other</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">other_file</span><span class="p">)</span>
+            <span class="n">audio_mix</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">mix_file</span><span class="p">})</span>
+            <span class="n">audio_vocal</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">vocal_file</span><span class="p">})</span>
+            <span class="n">audio_bass</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">bass_file</span><span class="p">})</span>
+            <span class="n">audio_drums</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">drums_file</span><span class="p">})</span>
+            <span class="n">audio_other</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;path&#39;</span><span class="p">:</span> <span class="n">other_file</span><span class="p">})</span>
+
+    <span class="n">ds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">({</span>
+        <span class="s1">&#39;audio_mix&#39;</span><span class="p">:</span> <span class="n">audio_mix</span><span class="p">,</span>
+        <span class="s1">&#39;audio_vocal&#39;</span><span class="p">:</span> <span class="n">audio_vocal</span><span class="p">,</span>
+        <span class="s1">&#39;audio_bass&#39;</span><span class="p">:</span> <span class="n">audio_bass</span><span class="p">,</span>
+        <span class="s1">&#39;audio_drums&#39;</span><span class="p">:</span> <span class="n">audio_drums</span><span class="p">,</span>
+        <span class="s1">&#39;audio_other&#39;</span><span class="p">:</span> <span class="n">audio_other</span><span class="p">,</span>
+        <span class="s1">&#39;path_mix&#39;</span><span class="p">:</span> <span class="n">path_mix</span><span class="p">,</span>
+        <span class="s1">&#39;path_vocal&#39;</span><span class="p">:</span> <span class="n">path_vocal</span><span class="p">,</span>
+        <span class="s1">&#39;path_bass&#39;</span><span class="p">:</span> <span class="n">path_bass</span><span class="p">,</span>
+        <span class="s1">&#39;path_drums&#39;</span><span class="p">:</span> <span class="n">path_drums</span><span class="p">,</span>
+        <span class="s1">&#39;path_other&#39;</span><span class="p">:</span> <span class="n">path_other</span><span class="p">,</span>
+    <span class="p">}))</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">features</span> <span class="o">=</span> <span class="n">Features</span><span class="p">({</span>
+    <span class="s1">&#39;audio_mix&#39;</span><span class="p">:</span> <span class="n">Audio</span><span class="p">(</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <span class="n">mono</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="s1">&#39;audio_vocal&#39;</span><span class="p">:</span> <span class="n">Audio</span><span class="p">(</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <span class="n">mono</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="s1">&#39;audio_bass&#39;</span><span class="p">:</span> <span class="n">Audio</span><span class="p">(</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <span class="n">mono</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="s1">&#39;audio_drums&#39;</span><span class="p">:</span> <span class="n">Audio</span><span class="p">(</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <span class="n">mono</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="s1">&#39;audio_other&#39;</span><span class="p">:</span> <span class="n">Audio</span><span class="p">(</span><span class="n">sampling_rate</span><span class="o">=</span><span class="mi">44100</span><span class="p">,</span> <span class="n">mono</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">decode</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
+    <span class="s1">&#39;path_mix&#39;</span><span class="p">:</span> <span class="n">Value</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;path_vocal&#39;</span><span class="p">:</span> <span class="n">Value</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;path_bass&#39;</span><span class="p">:</span> <span class="n">Value</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;path_drums&#39;</span><span class="p">:</span> <span class="n">Value</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">),</span>
+    <span class="s1">&#39;path_other&#39;</span><span class="p">:</span> <span class="n">Value</span><span class="p">(</span><span class="s1">&#39;string&#39;</span><span class="p">),</span>
+<span class="p">})</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "493d0057cb8949f8997937b626523eb8", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_ds</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dataset({
+    features: [&#39;audio_mix&#39;, &#39;audio_vocal&#39;, &#39;audio_bass&#39;, &#39;audio_drums&#39;, &#39;audio_other&#39;, &#39;path_mix&#39;, &#39;path_vocal&#39;, &#39;path_bass&#39;, &#39;path_drums&#39;, &#39;path_other&#39;],
+    num_rows: 477
+})
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "28bd14dcc5f04ccabcfe40b6aa80e00a", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">valid_ds</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Dataset({
+    features: [&#39;audio_mix&#39;, &#39;audio_vocal&#39;, &#39;audio_bass&#39;, &#39;audio_drums&#39;, &#39;audio_other&#39;, &#39;path_mix&#39;, &#39;path_vocal&#39;, &#39;path_bass&#39;, &#39;path_drums&#39;, &#39;path_other&#39;],
+    num_rows: 262
+})
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">train_ds</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="s2">&quot;danjacobellis/musdb_segments&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;train&#39;</span><span class="p">)</span>
+<span class="n">valid_ds</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="s2">&quot;danjacobellis/musdb_segments&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s1">&#39;validation&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "1e83e73fbe7c4519899c1fffe0c70cac", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5362003edd394e36880cf377c22360ec", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "fd87be85853d4d70a66afd34932bd707", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "4a1111d5942c41c3b33b78779915bef9", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "d8bec8d6412e408a8acb9bfbe38028dd", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "876ff9abec7649dfafe4591f6484483a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "f525a8f2ad8e4742a6540560d51102d9", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "05e5c201bf7c494787cc816f03ad53c8", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a61b4424941c400da5a0fcbd2a0af328", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "22623ec597b645c7b57035d371369f48", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "65a18af072cc408e97d267403a54ae66", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "71525445166e41f99e3e67ac39d63bda", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "fb61468f49214f3ba46359036ffed248", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "31ff7679df7c4211bbaa4eca5d035704", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "7581f83affcf45078eec12eb63299bc4", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5daa0f3f86b64d50b242527266f88642", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "c5f7cfecd89a4eb583d43d37f7693d01", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "25293e5b07d64618aff61335f4d4e490", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "afe8d15294a8414c8fa08829c2393259", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "fe6cd022fc5c4fcdb0796f96368083f1", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8467d23d398e48dcbe9c26fc608b06ee", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8c6be4ee25a34cf683cd86395585512d", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "3bb3f1fba0d14699ab8c57c1d6efc600", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5a1c8dff12704f29afac052674af7703", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "d13fad5ce5b04c388dc38d4cf6db256f", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "d3f7178e53a44b408eb1789174ec3315", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "cf2f869cb0f749b3a8878f354db5e49d", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "d0ed8bee994c400d8311d9fcfd99b6f3", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "95d37e229a2f4b0e8660808fbd0fecd9", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "59b23ee77aa04e069f9b3d32c67c9ce4", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "214875a8c6274c05af7eb6d3d3481689", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "0f0a42e8a5634aceb9a578dccb073fd1", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "eb990f906af042059c7d7679137a506d", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "1ca9415d7899467e812eb8afdd003185", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "c5f751630b3f49f793bf7155cee529c0", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e32a163988324ed4bd74c7ee4cf5b754", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a02405d87d3b4c46aefe1e5560d55dbb", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "0f9ce11c04a0401aa9cc7c626ef2302d", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "cf4c071f04064f24b85dc2dc75b0fa84", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "db6ad89f70ee460d80ddbc63e9c6da65", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "0206fe4cd8424a6a8c56397bd9fc9554", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "11719669a06d401f821073c10ea1171a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "bd92a7de4a604bea986bbc0ef4300d33", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b30edbe28d5d494d89c550d896b4590e", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "0dd7966b181a41cdaa3ae0ee236d78d1", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "24407249bde6494d923028fa64187ec1", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "059efd5498834235b0629075e09587a3", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "05fdc517714e4da493224ff0406ef1b9", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "72a3525b74a748eaaf0aadea8b09553a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "ba9c3e0c15844fa29ec4654578563a4c", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b51a3cfb04d24e7ba7c8f33722b9e395", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "446e55616f6f416baab199ea71c30a9b", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "1a5fc33c9c1b4946a431b1f8efbd1135", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "2d65902c5bb54ea0b2f91f9c1913a8cc", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "f0d65e33406948fb882b151f4dc946ca", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "375d857267a749809394132d2345124a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a96105326cdd4052a7cdfd3b15211f8a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "cb9a4259963647fea0323f16f3da7048", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "0957ab65ef604d90b8d3f430d8e87b32", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "7a43a3e105e745318a41beb64180c921", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9d386f4e3f4f452781823a468c53956c", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b494f5de3ac04263b3f79d2663d8c1be", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8602ff68bcab4559b587ebef3c424f43", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "3f31648d679148799ef0572ee51d108f", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "f416875087614280afc239ff3aaf83c8", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "3d2039e1c2ae41889b4ee6a6f12d2a70", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "bfc396f2db7e48318bac21c714fba687", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "fe380908eae640b0a7ba043f61711a69", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "1eb27dea3d9d4c728f8b81a866276d0b", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "78571ef56ad645e799928e8cf1215544", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "28f98087a2104ca0881f41bd475475a6", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9fd04a04ce8148e99b81852347ee111b", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e66a74a33fba4e37b26c1968374cc832", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "4d3c5b6970424d86bf6b422fc034ce90", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b49eae5a681d441b972d6d50914edb76", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "7c26aeaf97fd4707ae69c8fb97807e51", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9fc930a2cfad48ac89983409044ebd62", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "8e7afe8164fc4869bedabcd2829e6a83", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "3a16b657144247b585c2c79be64d472a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "bc44286a4cf940caa94a30fb3b46632a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "43da16dd894543299b6b565aae010d8a", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "245c5a06d84841cf91f136f2e22f191b", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e0c878db0a914992803ed801e0a5e6ef", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "0bc5ad5b04354a45b9c8ea28f5c5b0b1", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5465074518c641a08a757bc10a0020bd", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "998f0a9ee7244c0d9e809e09b20bcae0", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "ad5bae4a56cd4a76b23dec36f4f84c2c", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "17f6f1e36a26429bb264fb09b0eda961", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "98e3aa53aa8d4281beffa0e231278bda", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "99dcb787e7f54c75959b096fb47034d6", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b254b15421724d7288e10a73aef24d43", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "29ac5c1c26ec48768288a0a8241ce935", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "da8c2b549fe04e2bbc9670a8048e6d66", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "7c860ee38b644969803522e829f18c37", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5ac8f5d7403d4d4181182f5f57a509a3", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "23c0f0f4f8754accadca332ab28f53f6", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "778e8049c940401e803c38aca50ffb23", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "49aadb75c570438b9c83867bbc97eec0", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5b78350d9db449da92d9c902ddd2a856", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "2345ed538e6b4cd6bca253c914ce4661", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "551c3f6deecb48c6a35360a541fba791", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e4eb062e375e43f89ee76028ac1c3933", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "c592773008894400bd78b47589cc56be", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "bba952102b154d058c6cc229774a7e97", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "85621623ec6b4b8fa7c2c75c53e16986", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b3f38cd24a854331b7b1181e116a98b6", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "816c48c5eb044ffb80046af8a4448aca", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "dbdc537ee001444196b17ae590730365", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5e16de56d8454c82bc7c7f9383f55685", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "4cb573711ca44ce2b5c97b7ee7329745", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "de8bcd42d2294ef59c2dd85fdd8c2c8e", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "a3320377a6124b8daef6485dfeadbaf0", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "fc3dae1fe5634eb6911e9ee42d6d530c", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "b7ec2c412f314fbc929f03e810126537", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "051849f4da74453dbcd11e1c306301e2", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "9714346e42f0481bb607c0246b462234", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "58e5c46f13504d76a813ebf26999de3f", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "6c5a0055b5c24d67bdcedd6216abacd2", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "7900f1724b7f430f8bbed74c7593c120", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "22ae498a39fc4f648bdca4018c9024ad", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "fa183a212d474d188bdeeda739a9056e", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "49969ba8c76d4e2aa0fb0736306328a0", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "5cf98ad2ac004debbb034efc1dc15f55", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e6f299a06e0d419fab01242935e74799", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "e0bcf568c9b2450aa83f703f37dbba98", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "57454bc8195440cbb1f9565427618ce0", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "100f2d4d05f94244a1688450e32e13a9", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "7301c85ba83d442d88fd49d9d55354a5", "version_major": 2, "version_minor": 0}</script><script type="application/vnd.jupyter.widget-view+json">{"model_id": "066fad31fd944893987e17656842a178", "version_major": 2, "version_minor": 0}</script><div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>CommitInfo(commit_url=&#39;https://huggingface.co/datasets/danjacobellis/musdb_segments/commit/f964dceea4a08776edc16fe567a63f070a4e62da&#39;, commit_message=&#39;Upload dataset&#39;, commit_description=&#39;&#39;, oid=&#39;f964dceea4a08776edc16fe567a63f070a4e62da&#39;, pr_url=None, pr_revision=None, pr_num=None)
+</pre></div>
+</div>
+</div>
+</div>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./musdb"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="simple visible nav section-nav flex-column">
+</ul>
+
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+<p class="component-author">
+By Dan Jacobellis
+</p>
+
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
