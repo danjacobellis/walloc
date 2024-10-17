@@ -6,7 +6,7 @@ root: index
 
 parts:
 
-  - caption: Introduction
+  - caption: Usage
     chapters:
     - file: installation
     - file: image_compression
