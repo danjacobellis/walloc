@@ -1,0 +1,18 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: index
+
+parts:
+
+  - caption: Introduction
+    chapters:
+    - file: installation
+    - file: image_compression
+    - file: audio_compression
+    
+  - caption: Training
+    chapters:
+    - file: train_1d
+    - file: train_2d
