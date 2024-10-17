@@ -57,6 +57,8 @@
     <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
     <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'index';</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
@@ -390,9 +392,25 @@ document.write(`
 <li><p><a class="reference external" href="https://github.com/danjacobellis/lccl">Additional code accompanying the paper</a></p></li>
 <li><p><a class="reference external" href="https://huggingface.co/danjacobellis/walloc">Pre-trained codecs available on Hugging Face</a></p></li>
 </ul>
-<p><img alt="" src="_images/radar.svg" /></p>
-<p><img alt="" src="_images/walloc.svg" /></p>
-<p><img alt="" src="_images/wpt.svg" /></p>
+<figure class="align-default" id="radar">
+<img alt="../images/img/radar.svg" src="../images/img/radar.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 1 </span><span class="caption-text">Comparison of WaLLoC with other autoencoder designs for RGB Images and stereo audio.</span><a class="headerlink" href="#radar" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="walloc">
+<img alt="../images/img/wpt.svg" src="../images/img/wpt.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 2 </span><span class="caption-text">Example of forward and inverse WPT with <span class="math notranslate nohighlight">\(J=2\)</span> levels. Each level applies filters <span class="math notranslate nohighlight">\(\text{L}_{\text{A}}\)</span> and <span class="math notranslate nohighlight">\(\text{H}_{\text{A}}\)</span> independently to each of the signal channels, followed by downsampling by two <span class="math notranslate nohighlight">\((\downarrow 2)\)</span>. An inverse level consists of upsampling <span class="math notranslate nohighlight">\((\uparrow 2)\)</span> followed by <span class="math notranslate nohighlight">\(\text{L}_{\text{S}}\)</span>
+and <span class="math notranslate nohighlight">\(\text{H}_{\text{S}}\)</span>, then summing the two channels. The full WPT <span class="math notranslate nohighlight">\(\tilde{\textbf{X}}\)</span> of consists of <span class="math notranslate nohighlight">\(J\)</span> levels.</span><a class="headerlink" href="#walloc" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id1">
+<img alt="../images/img/walloc.svg" src="../images/img/walloc.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 3 </span><span class="caption-text">WaLLoC’s encode-decode pipeline. The entropy bottleneck and entropy coding steps are only required to achieve high compression ratios for storage and transmission. For compressed-domain learning where dimensionality reduction is the primary goal, these steps can be skipped to reduce overhead and completely eliminate CPU-GPU transfers.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">
