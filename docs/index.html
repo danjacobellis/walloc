@@ -394,6 +394,15 @@ document.write(`
 <li><p><a class="reference external" href="https://github.com/danjacobellis/lccl">Additional code accompanying the paper</a></p></li>
 <li><p><a class="reference external" href="https://huggingface.co/danjacobellis/walloc">Pre-trained codecs available on Hugging Face</a></p></li>
 </ul>
+<p>WaLLoC (Wavelet-Domain Learned Lossy Compression) is an architecture for learned compression that simultaneously satisfies three key
+requirements of compressed-domain learning:</p>
+<ol class="arabic simple">
+<li><p><strong>Computationally efficient encoding</strong> to reduce overhead in compressed-domain learning and support resource constrained mobile and remote sensors. WaLLoC uses a wavelet packet transform to expose signal redundancies prior to autoencoding. This allows us to replace the encoding DNN with a single linear layer (&lt;100k parameters) without significant loss in quality. WaLLoC incurs &lt;5% of the encoding cost compared to other neural codecs.</p></li>
+<li><p><strong>High compression ratio</strong> for storage and transmission efficiency. Lossy codecs typically achieve high compression with a combination of quantization and entropy coding. However, naive quantization of autoencoder latents leads to unpredictable and unbounded distortion. Instead, we apply additive noise during training as an
+entropy bottleneck, leading to quantization-resiliant latents. When combined with entropy coding, this provides nearly 12× higher compression ratio compared to the VAE used in Stable Diffusion 3, despite offering a higher degree of dimensionality reduction and similar quality.</p></li>
+<li><p><strong>Dimensionality reduction</strong> to accelerate compressed-domain modeling. WaLLoC’s encoder projects high-dimensional signal patches to low-dimensional latent representations, providing a reduction of up to 20×. This allows WaLLoC to be used as a drop-in replacement for resolution reduction while providing superior detail preservation and downstream accuracy.</p></li>
+</ol>
+<p>WaLLoC does not require perceptual or adversarial losses to represent high-frequency detail, making it compatible with a wide variety of signal types. It currently supports 1D and 2D signals, including mono, stereo, and multi-channel audio and grayscale, RGB, and hyperspectral images.</p>
 <figure class="align-default" id="radar">
 <img alt="_images/radar.svg" src="_images/radar.svg" />
 <figcaption>
@@ -413,6 +422,29 @@ and <span class="math notranslate nohighlight">\(\text{H}_{\text{S}}\)</span>, t
 <p><span class="caption-number">Fig. 3 </span><span class="caption-text">WaLLoC’s encode-decode pipeline. The entropy bottleneck and entropy coding steps are only required to achieve high compression ratios for storage and transmission. For compressed-domain learning where dimensionality reduction is the primary goal, these steps can be skipped to reduce overhead and completely eliminate CPU-GPU transfers.</span><a class="headerlink" href="#id1" title="Link to this image">#</a></p>
 </figcaption>
 </figure>
+<p><img alt="" src="_images/walloc_4x.svg" /></p>
+<p><img alt="" src="_images/sd3.svg" /></p>
+<figure class="align-default" id="walloc-16x">
+<img alt="_images/walloc_16x.svg" src="_images/walloc_16x.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 4 </span><span class="caption-text">RGB image reconstruction compared to stable diffusion.</span><a class="headerlink" href="#walloc-16x" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="stable-audio-comparison">
+<img alt="_images/stable_audio_comparison.svg" src="_images/stable_audio_comparison.svg" />
+<figcaption>
+<p><span class="caption-number">Fig. 5 </span><span class="caption-text">Stereo reconstruction performance compared to stable audio.</span><a class="headerlink" href="#stable-audio-comparison" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@article</span><span class="p">{</span><span class="n">jacobellis2024learned</span><span class="p">,</span>
+  <span class="n">title</span><span class="o">=</span><span class="p">{</span><span class="n">Learned</span> <span class="n">Compression</span> <span class="k">for</span> <span class="n">Compressed</span> <span class="n">Learning</span><span class="p">},</span>
+  <span class="n">author</span><span class="o">=</span><span class="p">{</span><span class="n">Jacobellis</span><span class="p">,</span> <span class="n">Dan</span> <span class="ow">and</span> <span class="n">Yadwadkar</span><span class="p">,</span> <span class="n">Neeraja</span> <span class="n">J</span><span class="o">.</span><span class="p">},</span>
+  <span class="n">year</span><span class="o">=</span><span class="p">{</span><span class="mi">2024</span><span class="p">},</span>
+  <span class="n">note</span><span class="o">=</span><span class="p">{</span><span class="n">Under</span> <span class="n">review</span><span class="p">},</span>
+  <span class="n">url</span><span class="o">=</span><span class="p">{</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">danjacobellis</span><span class="o">.</span><span class="n">net</span><span class="o">/</span><span class="n">walloc</span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
 <div class="toctree-wrapper compound">
 </div>
 <div class="toctree-wrapper compound">

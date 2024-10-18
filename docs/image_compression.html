@@ -412,26 +412,28 @@ document.write(`
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">SimpleNamespace</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageEnhance</span>
 <span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">display</span>
 <span class="kn">from</span> <span class="nn">torchvision.transforms</span> <span class="kn">import</span> <span class="n">ToPILImage</span><span class="p">,</span> <span class="n">PILToTensor</span>
 <span class="kn">from</span> <span class="nn">walloc</span> <span class="kn">import</span> <span class="n">walloc</span>
 <span class="kn">from</span> <span class="nn">walloc.walloc</span> <span class="kn">import</span> <span class="n">latent_to_pil</span><span class="p">,</span> <span class="n">pil_to_latent</span>
-<span class="k">class</span> <span class="nc">Config</span><span class="p">:</span> <span class="k">pass</span>
 </pre></div>
 </div>
 </div>
 </div>
 <section id="load-the-model-from-a-pre-trained-checkpoint">
 <h2>Load the model from a pre-trained checkpoint<a class="headerlink" href="#load-the-model-from-a-pre-trained-checkpoint" title="Link to this heading">#</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">wget</span> <span class="pre">https://hf.co/danjacobellis/walloc/resolve/main/RGB_Li_12c_J3_nf8_v1.0.2.pth</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">wget</span> <span class="pre">https://hf.co/danjacobellis/walloc/resolve/main/RGB_16x.pth</span></code></p>
+<p><code class="docutils literal notranslate"><span class="pre">wget</span> <span class="pre">https://hf.co/danjacobellis/walloc/resolve/main/RGB_16x.json</span></code></p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">device</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span>
-<span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;RGB_Li_12c_J3_nf8_v1.0.2.pth&quot;</span><span class="p">,</span><span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span><span class="n">weights_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">codec_config</span> <span class="o">=</span> <span class="n">checkpoint</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+<span class="n">codec_config</span> <span class="o">=</span> <span class="n">SimpleNamespace</span><span class="p">(</span><span class="o">**</span><span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;RGB_16x.json&quot;</span><span class="p">)))</span>
+<span class="n">checkpoint</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;RGB_16x.pth&quot;</span><span class="p">,</span><span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span><span class="n">weights_only</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="n">codec</span> <span class="o">=</span> <span class="n">walloc</span><span class="o">.</span><span class="n">Codec2D</span><span class="p">(</span>
     <span class="n">channels</span> <span class="o">=</span> <span class="n">codec_config</span><span class="o">.</span><span class="n">channels</span><span class="p">,</span>
     <span class="n">J</span> <span class="o">=</span> <span class="n">codec_config</span><span class="o">.</span><span class="n">J</span><span class="p">,</span>
