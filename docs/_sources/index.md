@@ -58,7 +58,7 @@ RGB image reconstruction compared to stable diffusion.
 ```
 
 
-```{figure} img/stable_audio_comparison.svg
+```{figure} img/audio_comparison.svg
 ---
 name: stable_audio_comparison
 ---
