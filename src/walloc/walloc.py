@@ -1,21 +1,26 @@
+import json
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import diffusers.models.autoencoders as autoencoders
 import einops
+import numpy as np
+from types import SimpleNamespace
 from einops import rearrange
 from pytorch_wavelets import DWTForward, DWT1DForward, DWTInverse, DWT1DInverse
 from torch.distributions import Normal
 from torchvision.transforms import ToPILImage, PILToTensor
 from PIL import Image
-
-import torch
-import torch.nn as nn
-import numpy as np
-import einops
 from pytorch_wavelets import DWTForward, DWTInverse
-from torch.distributions import Normal
-import diffusers.models.autoencoders as autoencoders 
+
+def load_config(path):
+    with open(path, 'r') as file:
+        data = json.load(file)
+    return SimpleNamespace(**data)
+
+def save_config(config, path):
+    with open(path, 'w') as file:
+        json.dump(vars(config), file, indent=4)
 
 class ToUniform(nn.Module):
     def __init__(self,scale,latent_max):
