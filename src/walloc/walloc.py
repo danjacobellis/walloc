@@ -351,8 +351,8 @@ class ResidualCodec2D(torch.nn.Module):
             residual = residual - X_hat
 
             # Accumulate loss
-            tf_loss = torch.nn.functional.mse_loss(X, cumulative_reconstruction)
-            recon_loss = torch.nn.functional.mse_loss(x, self.wavelet_synthesis(cumulative_reconstruction, J=self.J))
+            tf_loss = residual.norm()
+            recon_loss = self.wavelet_synthesis(residual, J=self.J).norm()
             total_loss += recon_loss
             tf_losses.append(tf_loss)
             recon_losses.append(recon_loss)
