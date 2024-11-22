@@ -262,6 +262,104 @@ class Codec1D(nn.Module):
         tf_loss = F.mse_loss( X, X_hat )
         return self.clamp(x_hat), F.mse_loss(x,x_hat), tf_loss
 
+class ResidualCodec2D(torch.nn.Module):
+    def __init__(self, channels, J, latent_dim, latent_bits, num_stages):
+        super(ResidualCodec2D, self).__init__()
+        self.channels = channels
+        self.J = J
+        self.latent_dim = latent_dim
+        self.latent_bits = latent_bits
+        self.num_stages = num_stages
+        self.latent_max = 2 ** (latent_bits - 1) - 1 + 0.5 - 1e-3
+        self.wt = DWTForward(J=1, mode="periodization", wave="bior4.4")
+        self.iwt = DWTInverse(mode="periodization", wave="bior4.4")
+        self.clamp = torch.nn.Hardtanh(min_val=-0.5, max_val=0.5)
+
+        # Entropy bottleneck
+        self.to_uniform = ToUniform(
+            scale=(2 ** (latent_bits - 1) - 1) / 1.85, latent_max=self.latent_max
+        )
+        self.round = Round()
+        self.to_normal = ToNormal(
+            scale=(2 ** (latent_bits - 1) - 1) / 1.85, latent_max=self.latent_max
+        )
+
+        # Linear encoders and decoders
+        self.encoders = torch.nn.ModuleList([
+            torch.nn.Conv2d(
+                in_channels=self.channels * (4 ** J),
+                out_channels=self.latent_dim,
+                kernel_size=1,
+                stride=1,
+                padding=0,
+            ) for _ in range(num_stages)
+        ])
+        self.decoders = torch.nn.ModuleList([
+            torch.nn.Conv2d(
+                in_channels=self.latent_dim,
+                out_channels=self.channels * (4 ** J),
+                kernel_size=1,
+                stride=1,
+                padding=0,
+            ) for _ in range(num_stages)
+        ])
+
+    def analysis_one_level(self, x):
+        L, H = self.wt(x)
+        X = torch.cat([L.unsqueeze(2), H[0]], dim=2)
+        X = einops.rearrange(X, "b c f h w -> b (c f) h w")
+        return X
+
+    def wavelet_analysis(self, x, J=3):
+        for _ in range(J):
+            x = self.analysis_one_level(x)
+        return x
+
+    def synthesis_one_level(self, X):
+        X = einops.rearrange(X, "b (c f) h w -> b c f h w", f=4)
+        L, H = torch.split(X, [1, 3], dim=2)
+        L = L.squeeze(2)
+        H = [H]
+        y = self.iwt((L, H))
+        return y
+
+    def wavelet_synthesis(self, x, J=3):
+        for _ in range(J):
+            x = self.synthesis_one_level(x)
+        return x
+
+    def forward(self, x):
+        X = self.wavelet_analysis(x, J=self.J)
+        residual = X
+        total_loss = 0
+        tf_losses = []
+        recon_losses = []
+
+        cumulative_reconstruction = torch.zeros_like(X)
+        for i_stage in range(self.num_stages):
+            # Encode
+            Z = self.encoders[i_stage](residual)
+            Z = self.to_uniform(Z)
+            Z = self.round(Z)
+
+            # Decode
+            Z = self.to_normal(Z)
+            X_hat = self.decoders[i_stage](Z)
+
+            # Update cumulative reconstruction
+            cumulative_reconstruction = cumulative_reconstruction + X_hat
+            residual = residual - X_hat
+
+            # Accumulate loss
+            tf_loss = torch.nn.functional.mse_loss(X, cumulative_reconstruction)
+            recon_loss = torch.nn.functional.mse_loss(x, self.wavelet_synthesis(cumulative_reconstruction, J=self.J))
+            total_loss += recon_loss
+            tf_losses.append(tf_loss)
+            recon_losses.append(recon_loss)
+
+        x_hat = self.wavelet_synthesis(cumulative_reconstruction, J=self.J)
+        return self.clamp(x_hat), total_loss, tf_losses, recon_losses
+
 def to_bytes(x, n_bits):
     max_value = 2**(n_bits - 1) - 1
     min_value = -max_value - 1
