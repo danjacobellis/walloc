@@ -262,6 +262,81 @@ class Codec1D(nn.Module):
         tf_loss = F.mse_loss( X, X_hat )
         return self.clamp(x_hat), F.mse_loss(x,x_hat), tf_loss
 
+class LinearCodec2D(nn.Module):
+    def __init__(self, channels, J, latent_dim, latent_bits):
+        super().__init__()
+        self.channels = channels
+        self.J = J
+        self.freq_bands = 4**J
+        self.latent_dim = latent_dim
+        self.latent_bits = latent_bits
+        self.latent_max = 2**(latent_bits-1)-1+0.5-1e-3
+        self.wt  = DWTForward(J=1, mode='periodization', wave='bior4.4')
+        self.iwt = DWTInverse(mode='periodization', wave='bior4.4')
+        self.clamp = torch.nn.Hardtanh(min_val=-0.5, max_val=0.5)
+        entropy_bottleneck = [
+            ToUniform(
+                scale = (2**(latent_bits-1)-1)/1.85,
+                latent_max = self.latent_max
+            ),
+            Round(),
+        ]
+        self.encoder = nn.Sequential(
+            nn.Conv2d(
+                in_channels=self.channels * self.freq_bands,
+                out_channels=self.latent_dim,
+                kernel_size=(1, 1),
+                stride=(1, 1),
+                padding=(0, 0),
+            ),
+            *entropy_bottleneck
+        )
+        self.decoder = nn.Sequential(
+            ToNormal(
+                scale = (2**(latent_bits-1)-1)/1.85,
+                latent_max = self.latent_max
+            ),
+            nn.Conv2d(
+                in_channels=self.latent_dim,
+                out_channels=self.channels * self.freq_bands,
+                kernel_size=(1, 1),
+                stride=(1, 1),
+                padding=(0, 0),
+            ),
+        )
+        
+    def analysis_one_level(self,x):
+        L, H = self.wt(x)
+        X = torch.cat([L.unsqueeze(2),H[0]],dim=2)
+        X = einops.rearrange(X, 'b c f h w -> b (c f) h w')
+        return X
+    
+    def wavelet_analysis(self,x,J=3):
+        for _ in range(J):
+            x = self.analysis_one_level(x)
+        return x
+    
+    def synthesis_one_level(self,X):
+        X = einops.rearrange(X, 'b (c f) h w -> b c f h w', f=4)
+        L, H = torch.split(X, [1, 3], dim=2)
+        L = L.squeeze(2)
+        H = [H]
+        y = self.iwt((L, H))
+        return y
+    
+    def wavelet_synthesis(self,x,J=3):
+        for _ in range(J):
+            x = self.synthesis_one_level(x)
+        return x
+            
+    def forward(self, x):
+        X = self.wavelet_analysis(x,J=self.J)
+        Y = self.encoder(X)
+        X_hat = self.decoder(Y)
+        x_hat = self.wavelet_synthesis(X_hat,J=self.J)
+        tf_loss = F.mse_loss(X, X_hat)
+        return self.clamp(x_hat), F.mse_loss(x,x_hat), tf_loss
+
 class ResidualCodec2D(torch.nn.Module):
     def __init__(self, channels, J, latent_dim, latent_bits, num_stages):
         super(ResidualCodec2D, self).__init__()
