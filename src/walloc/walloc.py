@@ -438,6 +438,48 @@ class ResidualCodec2D(torch.nn.Module):
         x_hat = self.wavelet_synthesis(cumulative_reconstruction, J=self.J)
         return self.clamp(x_hat), total_loss, tf_losses, recon_losses
 
+    def rae_encode(self, x):
+        X = self.wavelet_analysis(x, J=self.J)
+        residual = X
+        total_loss = 0
+        tf_losses = []
+        recon_losses = []
+        cumulative_reconstruction = torch.zeros_like(X)
+        latent = []
+        for i_stage in range(self.num_stages):
+            Z = self.encoders[i_stage](residual)
+            Z = self.to_uniform(Z)
+            Z = self.round(Z)
+            latent.append(Z)
+            Z = self.to_normal(Z)
+            X_hat = self.decoders[i_stage](Z)
+            tf_loss = torch.nn.functional.mse_loss(residual,X_hat)
+            recon_loss = torch.nn.functional.mse_loss(
+                self.wavelet_synthesis(residual, J=self.J),
+                self.wavelet_synthesis(X_hat, J=self.J)
+            )
+            tf_losses.append(tf_loss)
+            recon_losses.append(recon_loss)
+            total_loss += recon_loss
+            cumulative_reconstruction = cumulative_reconstruction + X_hat
+            residual = residual - X_hat
+        x_hat = self.wavelet_synthesis(cumulative_reconstruction, J=self.J)
+        return self.clamp(x_hat), torch.cat(latent,dim=1)
+        
+    def rae_decode(self, latent):
+        latent_splits = torch.split(latent, self.latent_dim, dim=1)
+        cumulative_reconstruction = torch.zeros(
+            (latent.shape[0], self.channels*(4**self.J), *latent.shape[2:]), 
+            device=latent.device
+        )
+        for i_stage in range(self.num_stages):
+            Z = latent_splits[i_stage]
+            Z = self.to_normal(Z)
+            X_hat = self.decoders[i_stage](Z)
+            cumulative_reconstruction = cumulative_reconstruction + X_hat
+        x_hat = self.wavelet_synthesis(cumulative_reconstruction, J=self.J)
+        return self.clamp(x_hat)
+
 def to_bytes(x, n_bits):
     max_value = 2**(n_bits - 1) - 1
     min_value = -max_value - 1
